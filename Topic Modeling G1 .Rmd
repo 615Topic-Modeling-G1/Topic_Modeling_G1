@@ -18,6 +18,7 @@ library(tidyverse)
 library(topicmodels)
 library(stopwords)
 library(ggplot2)
+library(DescTools)
 
 imdb <- read.csv("~/Desktop/IMDB Dataset.csv")
 
@@ -28,44 +29,67 @@ imdb <- read.csv("~/Desktop/IMDB Dataset.csv")
 
 ```{r}
 imdb <- imdb %>% select(-sentiment)
-imdb_df <- tibble(review = 1:50000, sentence = imdb[,1])
+# imdb_df <- tibble(review = 1:50000, sentence = imdb[,1])
+imdb_df <- imdb %>% slice_sample(n = 100, replace = FALSE)
 ```
 
 #Bigram
 ```{r}
-# token_bigram <- imdb_df %>% 
-#   unnest_tokens(bigram, 
-#                 review, 
-#                 token = "ngrams", 
-#                 n = 2, 
-#                 to_lower=TRUE) %>% 
-#   filter(!is.na(bigram))
+token_bigram <- imdb_df %>%
+  unnest_tokens(bigram,
+                review,
+                token = "ngrams",
+                n = 2,
+                to_lower=TRUE) %>%
+  filter(!is.na(bigram))
 
-token_bigram <- imdb_df %>% 
-  unnest_tokens(bigram, 
-                sentence, 
-                token = "ngrams", 
-                n = 2) %>% 
-  count(review,bigram,sort = TRUE)
+## create a stop word vector
+stop <-  unlist(stop_words[,1])
+## drop the attribute
+stop <- StripAttr(stop)
+## add to the stop list
+stop <- c(stop, "br")
+## split the bigram list into two columns
+check <-  token_bigram %>% separate(bigram, 
+                                    sep= " ", 
+                                    c("w1", "w2"))
 
-total_bigram <- token_bigram %>% 
-  group_by(review) %>% 
+## check both words individually agains stop word lists
+a <- check$w1 %in% stop
+b <- check$w2 %in% stop
+## the bigram is included only if neither 
+## of the single words is a stop word
+remove <- (a|b)
+## to make it easier to see create a data frame
+d <- cbind(token_bigram, a, b, remove)
+
+d <- d %>% filter(d$a !="br" && d$b != "br")
+
+## create an index of bigram
+f <- which(d$remove == FALSE)
+## use the index to make a list of bigrams
+g <- d$bigram[f]
+
+(review_separated <- token_bigram %>%  
+  separate(bigram, into = c("word1", "word2"), sep = " ")
+)
+review_united <- review_separated %>%
+  filter(!word1 %in% c('br'),
+         !word2 %in% c('br')) %>%
+  unite(bigram, c(word1, word2), sep = " ")
+
+freq_bigram <- token_bigram %>% count(bigram,sort = TRUE)
+
+total_bigram <- review_united %>%
+  group_by(review) %>%
   summarize(total = sum(n))
 
-review_bigram <- left_join(token_bigram, total_bigram)
-
-freq_by_rank_bi <- review_bigram %>% 
-  group_by(review) %>% 
-  mutate(rank = row_number(), 
-         `term frequency` = n/total) %>%
-  ungroup()
-
-freq_by_rank_bi %>% 
-  ggplot(aes(rank, `term frequency`, color = review)) + 
-  geom_line(size = 1.1, alpha = 0.8, show.legend = FALSE) + 
-  scale_x_log10() +
-  scale_y_log10()
+review_bigram <- left_join(review_united, token_bigram)
+rm(token_bigram, review_separated, review_united, token_bigram)
 ```
+
+
+
 
 
 
