@@ -134,4 +134,7 @@ beta_wide <- imdb_topics %>%
   mutate(log_ratio = log2(topic2 / topic1))
 ```
 
+```{r}
+##tfidf 
+```
 
