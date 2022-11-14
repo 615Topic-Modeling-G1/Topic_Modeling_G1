@@ -28,13 +28,36 @@ imdb <- read.csv("~/Desktop/IMDB Dataset.csv")
 
 ```{r}
 imdb <- imdb %>% select(-sentiment)
-imdb_df <- tibble(review = 1:50000, sentence = imdb[,1]) 
+imdb_df <- tibble(review = 1:50000, sentence = imdb[,1])
+```
 
+```{r}
+# token_bigram <- imdb_df %>% 
+#   unnest_tokens(bigram, 
+#                 review, 
+#                 token = "ngrams", 
+#                 n = 2, 
+#                 to_lower=TRUE) %>% 
+#   filter(!is.na(bigram))
+
+token_bigram <- imdb_df %>% 
+  unnest_tokens(bigram, 
+                sentence, 
+                token = "ngrams", 
+                n = 2) %>% 
+  count(review,bigram,sort = TRUE)
+```
+
+
+
+```{r}
 imdb <- imdb  %>%  mutate(docs = c(1:length(imdb$review)))
 
 data(stop_words)
 stop_words <- rbind(stop_words,c("br", "Smart"))
 ```
+
+
 
 # LDA
 ```{r}
@@ -60,6 +83,12 @@ imdb_top_terms %>%
   geom_col(show.legend = FALSE) +
   facet_wrap(~ topic, scales = "free") +
   scale_y_reordered()
+
+beta_wide <- imdb_topics %>%
+  mutate(topic = paste0("topic", topic)) %>%
+  pivot_wider(names_from = topic, values_from = beta) %>% 
+  filter(topic1 > .001 | topic2 > .001) %>%
+  mutate(log_ratio = log2(topic2 / topic1))
 ```
 
 
