@@ -80,9 +80,9 @@ review_united <- review_separated %>%
 
 freq_bigram <- token_bigram %>% count(bigram,sort = TRUE)
 
-total_bigram <- review_united %>%
-  group_by(review) %>%
-  summarize(total = sum(n))
+# total_bigram <- review_united %>%
+#   group_by(review) %>%
+#   summarize(total = sum(n))
 
 review_bigram <- left_join(review_united, token_bigram)
 rm(token_bigram, review_separated, review_united, token_bigram)
