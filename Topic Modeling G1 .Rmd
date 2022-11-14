@@ -31,6 +31,7 @@ imdb <- imdb %>% select(-sentiment)
 imdb_df <- tibble(review = 1:50000, sentence = imdb[,1])
 ```
 
+#Bigram
 ```{r}
 # token_bigram <- imdb_df %>% 
 #   unnest_tokens(bigram, 
@@ -46,6 +47,24 @@ token_bigram <- imdb_df %>%
                 token = "ngrams", 
                 n = 2) %>% 
   count(review,bigram,sort = TRUE)
+
+total_bigram <- token_bigram %>% 
+  group_by(review) %>% 
+  summarize(total = sum(n))
+
+review_bigram <- left_join(token_bigram, total_bigram)
+
+freq_by_rank_bi <- review_bigram %>% 
+  group_by(review) %>% 
+  mutate(rank = row_number(), 
+         `term frequency` = n/total) %>%
+  ungroup()
+
+freq_by_rank_bi %>% 
+  ggplot(aes(rank, `term frequency`, color = review)) + 
+  geom_line(size = 1.1, alpha = 0.8, show.legend = FALSE) + 
+  scale_x_log10() +
+  scale_y_log10()
 ```
 
 
