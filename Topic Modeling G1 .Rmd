@@ -1,0 +1,65 @@
+---
+title: "Topic Modeling Runci"
+author: "Runci Hu"
+date: "2022-11-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dplyr)
+library(stringr)
+library(tidyr)
+library(tidytext)
+library(tidyverse)
+library(topicmodels)
+library(stopwords)
+library(ggplot2)
+
+imdb <- read.csv("~/Desktop/IMDB Dataset.csv")
+
+
+# text_df <- tibble(review = 1:50000, sentence = imdb[,1]) 
+# text_df <- text_df[1:200,]
+```
+
+```{r}
+imdb <- imdb %>% select(-sentiment)
+imdb_df <- tibble(review = 1:50000, sentence = imdb[,1]) 
+
+imdb <- imdb  %>%  mutate(docs = c(1:length(imdb$review)))
+
+data(stop_words)
+stop_words <- rbind(stop_words,c("br", "Smart"))
+```
+
+# LDA
+```{r}
+imdb_dtm <- imdb %>%
+  unnest_tokens(word, review) %>%
+  anti_join(stop_words)%>%
+  count(docs, word) %>%
+  cast_dtm(docs, word, n)
+
+imdb_lda <- LDA(imdb_dtm, k = 10, control = list(seed = 2022))
+imdb_topics <- tidy(imdb_lda, matrix = "beta")
+imdb_topics
+
+imdb_top_terms <- imdb_topics %>%
+  group_by(topic) %>%
+  slice_max(beta, n = 10) %>% 
+  ungroup() %>%
+  arrange(topic, -beta)
+
+imdb_top_terms %>%
+  mutate(term = reorder_within(term, beta, topic)) %>%
+  ggplot(aes(beta, term, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free") +
+  scale_y_reordered()
+```
+
+
