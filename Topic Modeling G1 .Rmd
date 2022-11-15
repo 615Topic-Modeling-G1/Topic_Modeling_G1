@@ -128,7 +128,9 @@ head(sw)
 ```{r}
 imdb <- imdb  %>%  mutate(docs = c(1:length(imdb$review)))
 data(stop_words)
-stop_words <- rbind(stop_words,c("br", "Smart"))
+stop_words <- data.frame(stop_words$word)
+stop_words <- rbind(stop_words, "br", "movie", "film", "movies", "films", "scenes", "scene", "character", "characters", "watch", "watching")
+colnames(stop_words) <- c("word")
 ```
 
 
@@ -207,7 +209,7 @@ imdb_title_pair <- imdb_title %>%
   pairwise_count(word, docs, sort = TRUE, upper = FALSE)
 
 imdb_title_pair %>%
-  filter(n >= 3000) %>%
+  filter(n >= 2000) %>%
   graph_from_data_frame() %>%
   ggraph(layout = "fr") +
   geom_edge_link(aes(edge_alpha = n, edge_width = n), edge_colour = "royalblue") +
