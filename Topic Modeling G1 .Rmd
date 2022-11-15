@@ -218,9 +218,24 @@ imdb_title_pair %>%
 ```
 
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
+imdb_title_cor <- imdb_title %>% 
+  group_by(docs) %>%
+  filter(n() >= 500) %>%
+  pairwise_cor(word, docs, sort = TRUE, upper = FALSE)
 
+imdb_cor <- imdb_title_cor[1:1000,]
 
+set.seed(2022)
+imdb_cor %>%
+  filter(correlation > .9) %>%
+  graph_from_data_frame() %>%
+  ggraph(layout = "fr") +
+  geom_edge_link(aes(edge_alpha = correlation, edge_width = correlation), edge_colour = "royalblue") +
+  geom_node_point(size = 3) +
+  geom_node_text(aes(label = name), repel = TRUE,
+                 point.padding = unit(0.2, "lines")) +
+  theme_void()
 ```
 
 
