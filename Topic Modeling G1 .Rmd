@@ -102,7 +102,7 @@ freq_by_rank_bi %>%
   scale_x_log10() +
   scale_y_log10()
 ```
-
+From this graph, we can see that the word frequency has a decrease tendency. By this term frequency graph, we can choose words with the highest frequency and consider them as stop words. The following tf-idf is the method we test bigrams and find stop words.
 # tf-idf
 ```{r}
 review_tf_idf_bi <- review_bigram %>%
@@ -132,7 +132,7 @@ stop_words <- data.frame(stop_words$word)
 stop_words <- rbind(stop_words, "br", "movie", "film", "movies", "films", "scenes", "scene", "character", "characters", "watch", "watching")
 colnames(stop_words) <- c("word")
 ```
-
+For the LDA, we choose to use single-word stop words, because they learn beta, the per-topic-per-word probabilities, from the text book.
 
 # LDA
 ```{r}
