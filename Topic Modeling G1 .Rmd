@@ -137,5 +137,6 @@ beta_wide <- imdb_topics %>%
 
 ```{r}
 ##tfidf 
+##Lucy
 ```
 
