@@ -167,13 +167,13 @@ imdb_documents <- tidy(imdb_lda, matrix = "gamma")
 # check the per-document-per-topic probabilities using gamma
 imdb_documents <- imdb_documents %>%
   separate(document, c("title"),sep = "_", convert = TRUE)
-imdb_documents
+head(imdb_documents)
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 ggplot(imdb_documents, aes(x = gamma , fill = as.factor(topic))) + 
   geom_histogram()+
-  facet_wrimdb(~topic, ncol = 3) + 
+  facet_wrap(~topic, ncol = 3) + 
   scale_y_log10() +
   labs(title = "per-document-per-topic probabilities",
        y = "documents number", x= "gamma")
