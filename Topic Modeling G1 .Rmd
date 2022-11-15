@@ -178,6 +178,7 @@ imdb_documents <- imdb_documents %>%
   separate(document, c("title"),sep = "_", convert = TRUE)
 head(imdb_documents)
 ```
+According to imdb_document, each of these values is an estimated proportion of words in the document that were generated from that topic. We check the per-document-per-topic probabilities using gamma.
 
 ```{r, warning=FALSE, message=FALSE}
 ggplot(imdb_documents, aes(x = gamma , fill = as.factor(topic))) + 
@@ -187,7 +188,7 @@ ggplot(imdb_documents, aes(x = gamma , fill = as.factor(topic))) +
   labs(title = "per-document-per-topic probabilities",
        y = "documents number", x= "gamma")
 ```
-
+The plots above demonstrates the per document per topic probabilities of the words.the x-axis illustrates the per-document-per-topic probabilities, y-axis is the document number and different color represents different topics.
 
 ```{r}
 ggplot(imdb_documents, aes(factor(topic),gamma )) + 
@@ -195,7 +196,7 @@ ggplot(imdb_documents, aes(factor(topic),gamma )) +
   labs(title = "per-document-per-topic probabilities",
        y = "gamma", x= "topic")
 ```
-
+The box plot above demonstrates the gamma probabilities for each chapter within each book.
 
 ```{r, warning=FALSE, message=FALSE}
 imdb_title <- imdb %>%
