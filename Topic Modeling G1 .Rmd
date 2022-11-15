@@ -25,6 +25,7 @@ imdb <- read.csv("~/Desktop/IMDB Dataset.csv")
 
 # text_df <- tibble(review = 1:50000, sentence = imdb[,1]) 
 # text_df <- text_df[1:200,]
+
 ```
 
 ```{r}
