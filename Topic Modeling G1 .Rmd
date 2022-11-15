@@ -163,17 +163,17 @@ beta_wide <- imdb_topics %>%
 
 # Document Classification
 ```{r}
-ap_documents <- tidy(imdb_lda, matrix = "gamma")
+imdb_documents <- tidy(imdb_lda, matrix = "gamma")
 # check the per-document-per-topic probabilities using gamma
-ap_documents <- ap_documents %>%
+imdb_documents <- imdb_documents %>%
   separate(document, c("title"),sep = "_", convert = TRUE)
-ap_documents
+imdb_documents
 ```
 
 ```{r, warning=FALSE, message=FALSE}
-ggplot(ap_documents, aes(x = gamma , fill = as.factor(topic))) + 
+ggplot(imdb_documents, aes(x = gamma , fill = as.factor(topic))) + 
   geom_histogram()+
-  facet_wrap(~topic, ncol = 3) + 
+  facet_wrimdb(~topic, ncol = 3) + 
   scale_y_log10() +
   labs(title = "per-document-per-topic probabilities",
        y = "documents number", x= "gamma")
@@ -181,7 +181,7 @@ ggplot(ap_documents, aes(x = gamma , fill = as.factor(topic))) +
 
 
 ```{r}
-ggplot(ap_documents, aes(factor(topic),gamma )) + 
+ggplot(imdb_documents, aes(factor(topic),gamma )) + 
   geom_boxplot() +
   labs(title = "per-document-per-topic probabilities",
        y = "gamma", x= "topic")
