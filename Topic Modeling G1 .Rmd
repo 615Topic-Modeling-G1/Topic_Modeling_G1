@@ -85,7 +85,14 @@ total_bigram <- review_united %>%
 review_bigram <- left_join(review_united, total_bigram)
 rm(token_bigram, review_separated, review_united, total_bigram)
 ```
+
 ```{r}
+freq_by_rank_bi <- review_bigram %>% 
+  group_by(review) %>% 
+  mutate(rank = row_number(), 
+         `term frequency` = n/total) %>%
+  ungroup()
+
 freq_by_rank_bi %>% 
   ggplot(aes(rank, `term frequency`, color = review)) + 
   geom_line(size = 1.1, alpha = 0.8, show.legend = FALSE) + 
