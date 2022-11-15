@@ -28,18 +28,18 @@ text_df <- tibble(review = 1:50000, sentence = imdb[,1])
 
 ```{r}
 imdb <- imdb %>% select(-sentiment)
-# imdb_df <- tibble(review = 1:50000, sentence = imdb[,1])
-imdb_df <- imdb %>% slice_sample(n = 100, replace = FALSE)
+imdb_df <- tibble(review = 1:50000, sentence = imdb[,1])
+text_df <- imdb_df %>% slice_sample(n = 100, replace = FALSE)
 ```
 
 #Bigram
 ```{r}
-token_bigram <- imdb_df %>%
+token_bigram <- text_df %>%
   unnest_tokens(bigram,
-                review,
+                sentence, 
                 token = "ngrams",
                 n = 2,
-                to_lower=TRUE) %>%
+                to_lower=TRUE)  %>%
   filter(!is.na(bigram))
 
 ## create a stop word vector
@@ -72,21 +72,21 @@ g <- d$bigram[f]
 (review_separated <- token_bigram %>%  
   separate(bigram, into = c("word1", "word2"), sep = " ")
 )
+
 review_united <- review_separated %>%
   filter(!word1 %in% c('br'),
          !word2 %in% c('br')) %>%
   unite(bigram, c(word1, word2), sep = " ")
 
 freq_bigram <- token_bigram %>% count(bigram,sort = TRUE)
-```
 
-```{r}
+
 total_bigram <- review_united %>%
   group_by(review) %>%
-  summarize(total = sum(n))
+  summarize(total = sum(review))
 
-review_bigram <- left_join(review_united, token_bigram)
-rm(token_bigram, review_separated, review_united, token_bigram)
+review_bigram <- left_join(review_united, total_bigram)
+rm(token_bigram, review_separated, review_united, total_bigram)
 ```
 
 
@@ -136,7 +136,7 @@ beta_wide <- imdb_topics %>%
 ```
 
 ```{r}
-##tfidf 
-##Lucy
+
+
 ```
 
