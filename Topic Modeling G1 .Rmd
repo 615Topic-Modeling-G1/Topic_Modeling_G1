@@ -23,9 +23,7 @@ library(DescTools)
 imdb <- read.csv("~/Desktop/IMDB Dataset.csv")
 
 
-# text_df <- tibble(review = 1:50000, sentence = imdb[,1]) 
-# text_df <- text_df[1:200,]
-
+text_df <- tibble(review = 1:50000, sentence = imdb[,1]) 
 ```
 
 ```{r}
@@ -80,10 +78,12 @@ review_united <- review_separated %>%
   unite(bigram, c(word1, word2), sep = " ")
 
 freq_bigram <- token_bigram %>% count(bigram,sort = TRUE)
+```
 
-# total_bigram <- review_united %>%
-#   group_by(review) %>%
-#   summarize(total = sum(n))
+```{r}
+total_bigram <- review_united %>%
+  group_by(review) %>%
+  summarize(total = sum(n))
 
 review_bigram <- left_join(review_united, token_bigram)
 rm(token_bigram, review_separated, review_united, token_bigram)
