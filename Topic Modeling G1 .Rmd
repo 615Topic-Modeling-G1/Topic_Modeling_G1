@@ -21,9 +21,6 @@ library(ggplot2)
 library(DescTools)
 
 imdb <- read.csv("~/Desktop/IMDB Dataset.csv")
-
-
-text_df <- tibble(review = 1:50000, sentence = imdb[,1]) 
 ```
 
 ```{r}
@@ -39,7 +36,8 @@ token_bigram <- text_df %>%
                 sentence, 
                 token = "ngrams",
                 n = 2,
-                to_lower=TRUE)  %>%
+                to_lower=TRUE) %>%
+  count(review,bigram,sort = TRUE)%>%
   filter(!is.na(bigram))
 
 ## create a stop word vector
@@ -78,16 +76,33 @@ review_united <- review_separated %>%
          !word2 %in% c('br')) %>%
   unite(bigram, c(word1, word2), sep = " ")
 
-freq_bigram <- token_bigram %>% count(bigram,sort = TRUE)
-
+# freq_bigram <- token_bigram %>% count(bigram,sort = TRUE)
 
 total_bigram <- review_united %>%
   group_by(review) %>%
-  summarize(total = sum(review))
+  summarize(total = sum(n))
 
 review_bigram <- left_join(review_united, total_bigram)
 rm(token_bigram, review_separated, review_united, total_bigram)
 ```
+```{r}
+freq_by_rank_bi %>% 
+  ggplot(aes(rank, `term frequency`, color = review)) + 
+  geom_line(size = 1.1, alpha = 0.8, show.legend = FALSE) + 
+  scale_x_log10() +
+  scale_y_log10()
+```
+
+#tf-idf
+```{r}
+review_tf_idf_bi <- review_bigram %>%
+  bind_tf_idf(bigram, review, review)
+#look at terms with high tf-idf in reviews.
+review_tf_idf_bi <- review_tf_idf_bi %>%
+  select(-total) %>%
+  arrange(desc(tf_idf))
+```
+
 
 
 
