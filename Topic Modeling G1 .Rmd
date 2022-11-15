@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 library(dplyr)
 library(stringr)
 library(tidyr)
@@ -17,8 +17,11 @@ library(tidytext)
 library(tidyverse)
 library(topicmodels)
 library(stopwords)
+library(igraph)
+library(ggraph)
 library(ggplot2)
 library(DescTools)
+library(widyr)
 ```
 
 ```{r}
@@ -109,7 +112,7 @@ review_tf_idf_bi <- review_tf_idf_bi %>%
   select(-total) %>%
   arrange(desc(tf-idf))
 
-review_tf_idf_bi
+head(review_tf_idf_bi)
 ```
 
 # select bigram stop words 
@@ -186,4 +189,51 @@ ggplot(imdb_documents, aes(factor(topic),gamma )) +
   labs(title = "per-document-per-topic probabilities",
        y = "gamma", x= "topic")
 ```
+
+
+```{r, warning=FALSE, message=FALSE}
+imdb_title <- imdb %>%
+  unnest_tokens(word, review) %>%
+  anti_join(stop_words) %>%
+  count(docs, word, sort = TRUE)
+
+imdb_total <-imdb_title %>% 
+  group_by(docs) %>% 
+  summarize(total = sum(n))
+
+imdb_title <- left_join(imdb_title,imdb_total)
+
+imdb_title_pair <- imdb_title %>% 
+  pairwise_count(word, docs, sort = TRUE, upper = FALSE)
+
+imdb_title_pair %>%
+  filter(n >= 3000) %>%
+  graph_from_data_frame() %>%
+  ggraph(layout = "fr") +
+  geom_edge_link(aes(edge_alpha = n, edge_width = n), edge_colour = "royalblue") +
+  geom_node_point(size = 5) +
+  geom_node_text(aes(label = name), repel = TRUE, 
+                 point.padding = unit(0.2, "lines")) +
+  theme_void()
+```
+
+
+```{r}
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
